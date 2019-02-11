@@ -1,0 +1,117 @@
+<style type="css">
+.container_chart {
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    box-sizing:border-box;
+    padding:10px;
+}
+.chart_re{
+    position:relative;
+    height:650px;
+    padding:10px;
+}
+</style>
+<template>
+    <view class="chart_re">
+        <view class="container_chart" >
+        <echarts  :ec="ec" />
+    </view>
+    </view>
+
+</template>
+<script>
+import wepy from 'wepy';
+import Echarts from '../components/echart';
+import echartsApi from '../api/echartsApi';
+import Auth from "../mixins/Auth";
+
+export default class echartInvma extends wepy.page {
+
+    config = {
+        'navigationBarTitleText': '年度品类销量'
+    };
+
+    components = {
+        echarts: Echarts,
+    }
+    mixins = [Auth];
+    data = {
+        ec: {
+            lazyLoad :false,
+            option: {
+                title: {
+                    text: '品类销量',
+                    subtext: '来源INVMB-MB008',
+                    x: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    x: 'left',
+                    data: []
+                },
+                series: [
+                    {
+                        name: '品类销量',
+                        type: 'pie',
+                        radius: ['50%', '70%'],
+                        avoidLabelOverlap: false,
+                        label: {
+                            normal: {
+                                show: false,
+                                position: 'center'
+                            },
+                            emphasis: {
+                                show: true,
+                                textStyle: {
+                                    fontSize: '30',
+                                    fontWeight: 'bold'
+                                }
+                            }
+                        },
+                        labelLine: {
+                            normal: {
+                                show: true
+                            }
+                        },
+                        data: []
+                    }
+                ]
+   
+            }
+        }
+    }
+
+    methods = {
+
+    }
+    onShow () {
+
+    }
+    loadData () {
+      Promise.all([
+        echartsApi.getInvmaSale()
+      ]).then(datas => {
+        this.ec.option.legend.data = datas[0].legend;
+        this.ec.option.series[0].data = datas[0].values;
+        this.$broadcast('reloadchart');
+        this.$apply();
+      })
+    }
+
+    onLoad () {
+        this.auth().then(() => this.loadData());  
+    }
+
+}
+</script>

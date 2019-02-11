@@ -1,0 +1,195 @@
+<style lang="less">
+  .project-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx 0;
+
+    .project-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10rpx;
+      padding: 20rpx;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        /*height: 50rpx;*/
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+         min-width: 140rpx;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #333333;
+          min-width:160rpx;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+      }
+
+    }
+
+    .project-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+
+  .send-message-btn{
+    height: 48rpx;
+    line-height: 48rpx;
+    padding: 0 10rpx;
+    border-radius: 10rpx;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0099ff;
+  }
+  page{
+    background-color:#eee;
+  }
+  .progress{
+    background-color:#1cc51b;
+    height:20rpx;
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+    <view class="project-list">
+    <view class="project-item">
+     <view>{{mocta.tA001}}-{{mocta.tA002}}</view> 
+      <view>
+          <view class="item-row">
+            <view class="row-label">开单日期：</view>
+            <view class="row-content wrap">{{mocta.tA003}}</view>
+            <view class="row-label">状态：</view>
+            <view class="row-content wrap" style="{{item.color}}">{{mocta.tA011}}</view>
+          </view>
+          <view class="item-row">
+            <view class="row-label">牌号：</view>
+            <view class="row-content wrap">{{mocta.tA034}}</view>
+
+          </view>    
+          <view class="item-row">
+            <view class="row-label">规格：</view>
+            <view class="row-content wrap">{{mocta.tA035}}</view>
+          </view>           
+          <view class="item-row">
+            <view class="row-label">预计开工：</view>
+            <view class="row-content wrap">{{mocta.tA009}}</view>
+            <view class="row-label">预计完工：</view>
+            <view class="row-content wrap">{{mocta.tA010}}</view>
+          </view> 
+          <view class="item-row">
+            <view class="row-label">实际开工：</view>
+            <view class="row-content wrap">{{mocta.tA012}}</view>
+            <view class="row-label">实际完工：</view>
+            <view class="row-content wrap">{{mocta.tA014}}</view>
+          </view> 
+          <view class="item-row">
+            <view class="row-label">预计产量：</view>
+            <view class="row-content wrap">{{mocta.tA015}}</view>
+            <view class="row-label">已生产量：</view>
+            <view class="row-content wrap">{{mocta.tA017}}</view>
+          </view>  
+      </view>
+    </view>
+      <view class="project-item" wx:for="{{ sfctas }}">
+        <view style="display:flex">
+        <view style="color:#048b00;">{{item.tA009}}</view>
+        <view style="font-size: 15px;line-height:50rpx;margin-left:20rpx">预计完工</view>
+        </view>
+          <view class="item-row">
+            <view class="row-label">工艺：</view>
+            <view class="row-content wrap">{{item.tA004}}</view>
+            <view class="row-label">完成数：</view>
+            <view class="row-content wrap">{{item.tA011}}</view>
+          </view>
+          <view class="item-row">
+            <view class="row-label">完工比率：</view>
+            <view class="row-content wrap">{{item.rate}}</view>
+          </view>
+          <view class="item-row">
+               <view class="progress" style="width:{{item.widthstyle}};">
+               </view>
+          </view>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy';
+  import moctaApi from '../api/moctaApi';
+  import Auth from "../mixins/Auth";
+  export default class MoctaDetail extends wepy.page {
+    config = {
+      navigationBarTitleText: '工单详情'
+    };
+    mixins = [Auth];
+    loadData(){
+      wepy.showLoading();
+      let res;
+      if (this.type === "0") {
+        res = moctaApi.getMoctaDetail(this.ta001, this.ta002);
+      } else {
+        res = moctaApi.getMoctaCoptdDetail(this.td001, this.td002, this.td003);
+      }
+      res.then(respone => {
+        console.log(respone);
+        this.mocta = respone.mocta;
+        this.mocta.tA003 = this.mocta.tA003.substring(0,4) + '-' + this.mocta.tA003.substring(4,6) + '-' + this.mocta.tA003.substring(6,8);
+        this.mocta.tA009 = this.mocta.tA009.substring(0,4) + '-' + this.mocta.tA009.substring(4,6) + '-' + this.mocta.tA009.substring(6,8);
+        this.mocta.tA010 = this.mocta.tA010.substring(0,4) + '-' + this.mocta.tA010.substring(4,6) + '-' + this.mocta.tA010.substring(6,8);
+        this.mocta.tA012 = this.mocta.tA012.substring(0,4) + '-' + this.mocta.tA012.substring(4,6) + '-' + this.mocta.tA012.substring(6,8);
+        this.mocta.tA014 = this.mocta.tA014.substring(0,4) + '-' + this.mocta.tA014.substring(4,6) + '-' + this.mocta.tA014.substring(6,8);
+
+        this.sfctas = respone.sfcta;
+        this.sfctas.forEach((item,index)=>{
+          item.rate = (item.tA011 / this.mocta.tA015).toFixed(2);
+          item.widthstyle = (item.rate * 100) + '%';
+          item.tA009 = item.tA009.substring(0,4) + '-' + item.tA009.substring(4,6) + '-' + item.tA009.substring(6,8)
+        });
+        this.$apply();
+        wepy.hideLoading();
+      }).catch(error=>{
+
+      })
+    }
+
+    data = {
+        type: "0",
+        ta001: '',
+        ta002: '',
+        td001: '',
+        td002: '',
+        td003: '',
+        mocta:{},
+        sfctas:[],
+    };
+
+    onLoad(query) {
+      const { windowHeight } = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.type = query.type;
+      this.ta001 = query.ta001;
+      this.ta002 = query.ta002;
+      this.td001 = query.td001;
+      this.td002 = query.td002;
+      this.td003 = query.td003;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

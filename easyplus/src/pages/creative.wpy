@@ -1,0 +1,40 @@
+<style lang="less">
+    
+</style>
+<template>
+    <map id="myMap" show-location />
+</template>
+<script>
+    import wepy from 'wepy';
+    export default class Creative extends wepy.page {
+        config = {
+            navigationBarTitleText: '实验性功能'
+        }
+        events = {
+            
+        };
+        data = {
+            mapCtx:''
+        }
+
+        onLoad () {
+            wx.getLocation({
+                success : function(res){
+                    console.log(res);
+                }
+            });
+            wx.getConnectedWifi({
+                success : function(res){
+                    console.log(res);
+                }
+            });
+             this.mapCtx = wx.createMapContext('myMap');
+                 this.mapCtx.getCenterLocation({
+                    success: function(res){
+                        console.log(res.longitude)
+                        console.log(res.latitude)
+                }
+            })
+        }
+    }
+</script>

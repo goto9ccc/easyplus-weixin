@@ -1,0 +1,199 @@
+<style lang="less">
+  .wrapper {
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 30rpx 30rpx 0;
+
+    .row {
+      box-sizing: border-box;
+      width: 100%;
+      line-height: 50rpx;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin-bottom: 10rpx;
+
+      .row-label {
+        font-size: 14px;
+        width: 160rpx;
+        line-height: 84rpx;
+        text-align: left;
+        color: #00acff;
+      }
+
+      .row-content {
+        font-size: 14px;
+      }
+    }
+
+    .input,
+    .input-text-area{
+      box-sizing: border-box;
+      width: 530rpx;
+      /*display: block;*/
+      padding: 20rpx;
+      border: 1rpx solid #eee;
+      font-size: 14px;
+      line-height: 40rpx;
+      color: #353535;
+      border-radius: 10rpx;
+    }
+    .input {
+      height: 84rpx;
+    }
+
+    .input-text-area {
+      min-height: 280rpx;
+    }
+
+    .btn-row {
+      box-sizing: border-box;
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    button {
+      box-sizing: border-box;
+      height: 78rpx;
+      line-height: 78rpx;
+      background-color: #00acff;
+      color: #fff;
+      font-size: 14px;
+      border: 0 none;
+      border-radius: 14rpx;
+      flex-grow: 1;
+      margin-right: 10rpx;
+    }
+
+    button:last-child {
+      margin-left: 10rpx;
+      margin-right: 0;
+    }
+
+    .button-hover {
+      opacity: .8;
+    }
+
+    button.go-back {
+      background-color: #ccc;
+      color: #353535;
+    }
+
+    .checkbox{
+      display: inline-block;
+      margin: 5px 10px 5px 0;
+    }
+  }
+</style>
+
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+    <view class="row">
+      <view class="row-label">品名：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{mb002}}" @input="handleInputMb002"/>
+      </view>
+    </view>
+        <view class="row">
+      <view class="row-label">规格：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{mb003}}" @input="handleInputMb003"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">仓库：</view>
+      <view class="row-content">
+        <picker mode="selector" range="{{stores}}" range-key="{{'mC002'}}" value="{{index}}" @change="handleChangeStore">
+          <view class="input">
+            {{storename}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="row">
+      <view class="btn-row">
+        <button hover-class="button-hover" @tap="handleSearch">搜索</button>
+        <button type="default" class="go-back" hover-class="button-hover" @tap="handleGoBak">返回</button>
+      </view>
+    </view>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import storeApi from '../api/storeApi';
+  import Auth from '../mixins/Auth';
+
+  export default class StoreSearch extends wepy.page {
+    config = {
+      navigationBarTitleText: '库存多条件查询'
+    };
+
+    components = {
+    };
+
+    mixins = [Auth];
+
+    data = {
+      mb002: '',
+      mb003: '',
+      minHeight: 0,
+      storename: '',
+      mc001:'',
+      stores: []
+    };
+
+    methods = {
+      handleInputMb002 (e) {
+        this.mb002 = e.detail.value;
+      },
+      handleInputMb003 (e) {
+        this.mb003 = e.detail.value;
+      },
+      handleChangeStore (e) {
+          console.log(e);
+        const index = parseInt(e.detail.value);
+        this.storename = this.stores[index].mC002;
+        this.mc001 = this.stores[index].mC001;
+      },
+
+      handleSearch () {
+        wepy.redirectTo({
+          url: `./store?type=1&keyword=${this.mb002}&mb003=${this.mb003}&mc002=${this.mc001}`
+        });
+      },
+      handleGoBak () {
+        wepy.redirectTo({
+          url: './store'
+        });
+      },
+    };
+
+    events = {};
+
+    loadData() {
+      wepy.showLoading();
+      Promise.all([
+        storeApi.getStoreType()
+      ]).then(datas => {
+        console.log(datas);
+        this.stores = datas[0];
+        wepy.hideLoading();
+        this.$apply();
+      })
+    }
+
+    onLoad() {
+      const {windowHeight} = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

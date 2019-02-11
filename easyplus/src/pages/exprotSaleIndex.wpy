@@ -1,0 +1,415 @@
+<style lang="less">
+  .total-data{
+    width: 690rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    margin-top: 16rpx;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+      margin-bottom: 10rpx;
+    .data-item{
+      width: 345rpx;
+      height: 130rpx;
+      box-sizing: border-box;
+      padding: 19rpx 0 19rpx 54rpx;
+    }
+
+    .item-link{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+
+    .data-item:nth-child(2n+1){
+      border-right: 1rpx solid #eeeeee;;
+      border-bottom: 1rpx solid #eeeeee;
+    }
+    .data-item:nth-child(2n){
+      border-bottom: 1rpx solid #eeeeee;
+    }
+    .data-item:nth-child(5),
+    .data-item:nth-child(6){
+      border-bottom: 0 none;
+    }
+  }
+
+  .item-link {
+    .item-icon{
+      width: 90rpx;
+      height: 90rpx;
+    }
+    .item-txt{
+      margin-left: 10rpx;
+      .title{
+        display: block;
+        font-size: 15px;
+        color: #333333;
+      }
+
+      .txt{
+        display: block;
+        font-size: 12px;
+        color: #333333;
+        .number{
+          font-size: 17px;
+          font-weight: 700;
+          color: #ff6600;
+          display: inline;
+        }
+      }
+    }
+  }
+
+  .chart-tabs{
+    margin-top: 20rpx;
+    width: 690rpx;
+    height: 400rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    .tabs-header{
+      width: 100%;
+      height: 80rpx;
+      line-height: 80rpx;
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+      .header-item{
+        height: 100%;
+        width: 50%;
+        box-sizing: border-box;
+        text-align: center;
+        border-bottom: 1rpx solid #e5e5e5;
+        font-size: 16px;
+        color: #666666;
+      }
+      .header-item.on{
+        border-bottom: 3rpx solid #5382ee;
+        color: #0066cc;
+      }
+    }
+
+    .tabs-content{
+      width: 100%;
+      height: 370rpx;
+      .content-item{
+        display: none;
+        height: 370rpx;
+        width: 100%;
+        .chart-title{
+          width: 100%;
+          line-height: 60rpx;
+          height: 60rpx;
+          font-size: 12px;
+          text-align: center;
+        }
+        .chart-canvas{
+          width: 100%;
+          height: 310rpx;
+          margin: 0 auto;
+        }
+      }
+      .content-item.on{
+        display: block;
+      }
+    }
+  }
+
+  .index-nav{
+    margin-top: 20rpx;
+    width: 690rpx;
+    background-color: #fff;
+    border-radius: 16rpx 16rpx 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    .nav-item{
+      width: 230rpx;
+      height: 170rpx;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 20rpx 0;
+      .nav-icon{
+        width: 90rpx;
+        height: 90rpx;
+        display: block;
+        margin: 0 auto;
+      }
+      .nav-name{
+        font-size: 14px;
+        color: #333333;
+        line-height: 40rpx;
+      }
+    }
+  }
+
+  .remind-wrap {
+    margin-top: 20rpx;
+    box-sizing: border-box;
+    width: 690rpx;
+    padding: 0 30rpx;
+    font-size: 14px;
+    color: #353535;
+    line-height: 88rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    position: relative;
+    display: none;
+
+    .red {
+      color: red;
+    }
+
+    .close {
+      position: absolute;
+      top: 10rpx;
+      right: 10rpx;
+      width: 30rpx;
+      height: 30rpx;
+      line-height: 30rpx;
+      padding: 20rpx;
+      color: #eee;
+    }
+  }
+
+  .remind-wrap.on {
+    display: block;
+  }
+  page{
+    background-color:#eee;
+  }
+  .project-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx 0;
+
+    .project-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10rpx;
+      padding: 20rpx;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        /*height: 50rpx;*/
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+         min-width: 140rpx;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #333333;
+          min-width:180rpx;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+        .row-content.tel{
+          text-decoration: underline;
+
+          .tel-icon{
+            width: 28rpx;
+            height: 26rpx;
+          }
+        }
+
+      }
+
+    }
+
+    .project-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+
+
+</style>
+<template>
+  <view class="wrapper">
+    <view class="total-data">
+      <view class="data-item">
+        <navigator class="item-link" url="./coptd?td001=2203&td016=N&type=1">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-1.png"></image>
+          <view class="item-txt">
+            <view class="title">未交付订单</view>
+            <view class="txt"><text class="number">{{totalMain[0]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./coptd?td001=2203&td016=N&type=1&td013={{currentdate}}">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-2.png"></image>
+          <view class="item-txt">
+            <view class="title">超交期订单</view>
+            <view class="txt"><text class="number">{{totalMain[1]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./mocta?type=1&ta026=2203&ta011=N">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-3.png"></image>
+          <view class="item-txt">
+            <view class="title">未完成工单</view>
+            <view class="txt"><text class="number">{{totalMain[2]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./mocta?type=1&ta026=2203&ta011=N">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-4.png"></image>
+          <view class="item-txt">
+            <view class="title">超交期工单</view>
+            <view class="txt"><text class="number">{{totalMain[3]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+    </view>
+
+    <view class="project-list">
+      <view class="project-item" wx:for="{{ list }}">
+        <navigator class="item-link" url="./exportSaleCoptd?type=1&tc003={{item.mA001}}&td016=N">
+        <view class="item-row">
+            <view class="row-label">客户简称：</view>
+            <view class="row-content wrap">{{item.mA002}}</view>
+                        <view class="row-label ">未交订单：</view>
+            <view class="row-content wrap warring" style="color:red;">{{item.udF51}}</view>
+          </view>
+
+        <view class="item-row">
+            <view class="row-label">年度订单：</view>
+            <view class="row-content wrap">{{item.udF52}}条</view>
+                        <view class="row-label">年度销货：</view>
+            <view class="row-content wrap">{{item.udF53}}万元</view>
+          </view>
+        </navigator>
+      </view>
+    </view>
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import exportIndexApi from '../api/exportIndexApi';
+  import copmaApi from '../api/copmaApi';
+  import Auth from '../mixins/Auth';
+  import SearchBar from '../components/SearchBar';
+  import ListBottom from '../components/ListBottom';
+  export default class ExportSaleIndex extends wepy.page {
+    config = {
+      navigationBarTitleText: '外销专题'
+    }
+    components = {
+        'list-bottom': ListBottom,
+        'search-bar': SearchBar
+    }
+    data = {
+      totalMain: [0, 0, 0, 0],
+      total: 0,
+      page: 1,
+      limit: 100,
+      list: [],
+      remind: 0,
+      currentdate:''
+    }
+
+    mixins = [Auth];
+    //计算属性
+    computed = {
+
+
+    }
+
+    methods = {
+    }
+
+    loadData(){
+      wepy.showLoading();
+      let res;
+      res = copmaApi.getCopmaWxList(this.page, this.limit);     
+      res.then(respone => {    
+        this.total = respone.count; 
+        respone.data.forEach((item,index)=>{
+            item.udF53 = (item.udF53 / 10000).toFixed(2);
+            item.udF54 = (item.udF53 / 10000).toFixed(2);
+        });
+        this.list = [
+          ...this.list,
+          ...respone.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    //获取当前时间
+    getNowFormatDate() {
+        let date = new Date();
+        let seperator1 = "-";
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        let currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+      this.page++;
+      this.loadData();
+    }
+
+
+    onLoad() {
+      this.auth().then(()=>{
+      const { windowWidth } = this.$parent.getSystemInfo();
+      this.currentdate = this.getNowFormatDate();
+      console.log(this.currentdate);
+      const rpx = windowWidth / 750;
+      Promise.all([
+          exportIndexApi.getIndexCount(),
+        ]).then(datas=>{
+          this.totalMain[0] = datas[0].coptdCount;
+          this.totalMain[1] = datas[0].cjqCount;
+          this.totalMain[2] = datas[0].moctaCount;
+          this.totalMain[3] = datas[0].cjqMocta;
+          this.$apply();
+        }).then(()=>{
+          this.loadData();
+        });
+      });
+    }
+  }
+</script>

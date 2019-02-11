@@ -1,0 +1,20 @@
+<style lang="less">
+    p{
+        display:inline-block;
+    }
+    view{
+        padding-top:50px;
+        text-align:center;
+    }
+</style>
+<template>
+    <view>
+        <p>暂未完成，静请期待</p>
+    </view>    
+</template>
+<script>
+    import wepy from 'wepy';
+    export default class NoFinish extends wepy.page {
+
+    }
+</script>

@@ -1,0 +1,84 @@
+<style lang="less">
+  .search-bar{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20rpx 30rpx;
+    background-color: #fff;
+    .search-wrapper{
+      box-sizing: border-box;
+      width: 100%;
+      background-color: #fff;
+      border-radius: 16rpx;
+      height: 62rpx;
+      border: 1rpx solid #dcdcdc;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .search-input{
+      box-sizing: border-box;
+      background-color: #fff;
+      border-radius: 16rpx 0 0 16rpx;
+      border: 0 none;
+      height: 58rpx;
+      width: 608rpx;
+      line-height: 58rpx;
+      padding: 0 10rpx;
+      font-size: 12px;
+    }
+
+    .search-btn{
+      height: 60rpx;
+      width: 80rpx;
+      box-sizing: border-box;
+      padding: 10rpx 20rpx;
+    }
+    .search-icon{
+      height: 40rpx;
+      width: 40rpx;
+    }
+  }
+</style>
+
+<template>
+  <view class="search-bar">
+    <view class="search-wrapper">
+      <input class="search-input" placeholder="关键字查询" type="text" confirm-type="search" value="{{keyword}}" @input="handleSearchInput" @confirm="handleSearch" />
+      <view class="search-btn" @tap="handleSearch">
+        <image class="search-icon" mode="aspectFit" src="../assets/images/search-icon.png"></image>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+
+  export default class SearchBar extends wepy.component {
+    components = {};
+
+    props = {
+      keyword: {
+        type: String,
+        twoWay: true
+      }
+    };
+
+    data = {};
+
+    computed = {};
+
+    methods = {
+      handleSearchInput(event){
+        this.keyword = event.detail.value;
+      },
+      handleSearch(){
+        this.$emit('search-confirm');
+      }
+    };
+
+    events = {};
+  }
+</script>

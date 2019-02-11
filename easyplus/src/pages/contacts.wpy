@@ -1,0 +1,216 @@
+<style lang="less">
+
+  .search-result{
+    height: 90rpx;
+    line-height: 90rpx;
+
+    .btn-list {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .send-message-btn{
+      height: 58rpx;
+      line-height: 58rpx;
+      padding: 0  10rpx;
+      border-radius: 10rpx;
+      font-size: 12px;
+      color: #fff;
+      background-color: #0099ff;
+      margin-right: 10px;
+    }
+    .send-message-btn:last-child {
+      margin-right: 0;
+    }
+
+  }
+
+  .contacts-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx;
+
+    .contacts-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 20rpx;
+      padding: 19rpx 60rpx;
+      background-color: #fff;
+      border-radius: 16rpx;
+      position: relative;
+      overflow: hidden;
+
+      .select{
+        width: 55rpx;
+        height: 40rpx;
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        .select-icon{
+          width: 55rpx;
+          height: 40rpx;
+        }
+      }
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+          /*width: 120rpx;*/
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #0066cc;
+        }
+
+        .row-content.tel{
+          text-decoration: underline;
+
+          .tel-icon{
+            width: 28rpx;
+            height: 26rpx;
+          }
+        }
+      }
+
+    }
+
+    .contacts-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px">
+
+    <search-bar :keyword.sync="keyword" @search-confirm.user="handleSearchConfirm"></search-bar>
+
+    <view class="search-result">
+      <view class="result-txt">
+        共找到<text class="result-number">{{total}}</text>人
+      </view>
+    </view>
+
+    <view class="contacts-list">
+
+      <view class="contacts-item" wx:for="{{ list }}" wx:for-index="i" wx:for-item="item" wx:key="item.id" >
+        <view class="item-row">
+          <view class="row-label">姓名：</view>
+          <view class="row-content">{{item.mV002}}</view>
+        </view>
+        <view class="item-row" wx-if="{{item.dept !== ''}}">
+          <view class="row-label">部门：</view>
+          <view class="row-content">{{item.mE002}}</view>
+        </view>
+        <view class="item-row">
+          <view class="row-label">手机：</view>
+          <view class="row-content tel" @tap.stop="handleCallPhone({{item.mV015}})">{{item.mV015}}</view>
+        </view>
+                <view class="item-row">
+          <view class="row-label">手机：</view>
+          <view class="row-content tel" @tap.stop="handleCallPhone({{item.mV016}})">{{item.mV016}}</view>
+        </view>
+      </view>
+
+    </view>
+
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import contactsApi from '../api/contactsApi';
+  import SearchBar from '../components/SearchBar';
+  import ListBottom from '../components/ListBottom';
+  import Auth from '../mixins/Auth';
+
+  export default class Contacts extends wepy.page {
+    config = {
+      navigationBarTitleText: '联系人'
+    };
+
+    components = {
+      'list-bottom': ListBottom,
+      'search-bar': SearchBar
+    };
+
+    mixins = [Auth];
+
+    data = {
+      minHeight: 0,
+      total: 0,
+      keyword: '',
+      pageIndex: 1,
+      pageSize: 100,
+      list: [],
+      selected: [],
+      isSelectAll: false
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+      handleSearchConfirm(){
+        this.list = [];
+        this.pageIndex = 1;
+        this.loadData();
+      },
+      handleCallPhone(callNumber){
+        wepy.makePhoneCall({
+          phoneNumber: callNumber
+        })
+      },
+    };
+
+    events = {};
+
+    loadData(){
+      wepy.showLoading();
+      contactsApi.getContactList(this.pageIndex, this.pageSize, this.keyword).then(data => {
+        console.log(data);
+        this.total = data.count;
+        this.list = [
+          ...this.list,
+          ...data.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+
+      this.pageIndex++;
+      this.loadData();
+    }
+
+    onLoad(query) {
+      const { windowHeight } = this.$parent.getSystemInfo();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.keyword = query.keyword || '';
+      this.pageIndex = query.pageIndex ? parseInt(query.pageIndex) : 1;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

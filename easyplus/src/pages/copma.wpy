@@ -1,0 +1,207 @@
+<style lang="less">
+  .project-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx 0;
+
+    .project-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10rpx;
+      padding: 20rpx;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        /*height: 50rpx;*/
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+         min-width: 140rpx;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #333333;
+          min-width:180rpx;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+        .row-content.tel{
+          text-decoration: underline;
+
+          .tel-icon{
+            width: 28rpx;
+            height: 26rpx;
+          }
+        }
+
+      }
+
+    }
+
+    .project-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+
+  .send-message-btn{
+    height: 48rpx;
+    line-height: 48rpx;
+    padding: 0 10rpx;
+    border-radius: 10rpx;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0099ff;
+  }
+  .warring{
+    color:red;
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+    <search-bar :keyword.sync="keyword" @search-confirm.user="handleSearchConfirm"></search-bar>
+    <view class="project-list">
+      <view class="project-item" wx:for="{{ list }}">
+        <view class="item-row">
+            <view class="row-label">客户简称：</view>
+            <view class="row-content wrap">{{item.mA002}}</view>
+                        <view class="row-label ">未交订单：</view>
+            <view class="row-content wrap warring" style="color:red;">{{item.udF51}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">客户全称：</view>
+            <view class="row-content wrap">{{item.mA003}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">负责人：</view>
+            <view class="row-content wrap">{{item.mA004.trim}}</view>
+                        <view class="row-label">联系人：</view>
+            <view class="row-content wrap">{{item.mA005}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">电话：</view>
+            <view class="row-content wrap tel" @tap.stop="handleCallPhone({{item.mA006}})">{{item.mA006}}</view>
+            <view class="row-content wrap tel" @tap.stop="handleCallPhone({{item.mA007}})">{{item.mA007}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">税号：</view>
+            <view class="row-content wrap">{{item.mA010}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">注册地址：</view>
+            <view class="row-content wrap">{{item.mA023}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">送货地址：</view>
+            <view class="row-content wrap">{{item.mA027}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">年度订单：</view>
+            <view class="row-content wrap">{{item.udF52}}条</view>
+                        <view class="row-label">年度销货：</view>
+            <view class="row-content wrap">{{item.udF53}}万元</view>
+          </view>
+
+      </view>
+    </view>
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import copmaApi from '../api/copmaApi';
+  import SearchBar from '../components/SearchBar';
+  import ListBottom from '../components/ListBottom';
+  import Auth from "../mixins/Auth";
+  export default class Copma extends wepy.page {
+    config = {
+      navigationBarTitleText: '客户查询'
+    };
+    //引入组件
+    components = {
+      'list-bottom': ListBottom,
+      'search-bar': SearchBar
+    };
+    //集成认证
+    mixins = [Auth];
+
+    data = {
+      type: 0,
+      minHeight: 0,
+      total: 0,
+      keyword: '',
+      page: 1,
+      limit: 10,
+      list: [],
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+      handleSearchConfirm(){
+        this.type = 0;
+        this.list = [];
+        this.page = 1;
+        this.loadData();
+      },
+      handleCallPhone(callNumber){
+        wepy.makePhoneCall({
+          phoneNumber: callNumber
+        })
+      },
+    };
+
+    events = {};
+
+    loadData(){
+      wepy.showLoading();
+      let res;
+      res = copmaApi.getCopmaList(this.page, this.limit, this.keyword);     
+      res.then(respone => {    
+        this.total = respone.count;
+        respone.data.forEach((item,index)=>{
+            item.udF53 = (item.udF53 / 10000).toFixed(2);
+            item.udF54 = (item.udF53 / 10000).toFixed(2);
+        });
+        this.list = [
+          ...this.list,
+          ...respone.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+      this.page++;
+      this.loadData();
+    }
+
+    onLoad(query) {
+      const { windowHeight } = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.keyword = query.keyword || '';
+      this.page = query.page ? parseInt(query.page) : 1;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

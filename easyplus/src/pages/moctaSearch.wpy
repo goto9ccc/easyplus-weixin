@@ -1,0 +1,245 @@
+<style lang="less">
+  .wrapper {
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 30rpx 30rpx 0;
+
+    .row {
+      box-sizing: border-box;
+      width: 100%;
+      line-height: 50rpx;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin-bottom: 10rpx;
+
+      .row-label {
+        font-size: 14px;
+        width: 160rpx;
+        line-height: 84rpx;
+        text-align: left;
+        color: #00acff;
+      }
+
+      .row-content {
+        font-size: 14px;
+      }
+    }
+
+    .input,
+    .input-text-area{
+      box-sizing: border-box;
+      width: 530rpx;
+      /*display: block;*/
+      padding: 20rpx;
+      border: 1rpx solid #eee;
+      font-size: 14px;
+      line-height: 40rpx;
+      color: #353535;
+      border-radius: 10rpx;
+    }
+    .input {
+      height: 84rpx;
+    }
+
+    .input-text-area {
+      min-height: 280rpx;
+    }
+
+    .btn-row {
+      box-sizing: border-box;
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    button {
+      box-sizing: border-box;
+      height: 78rpx;
+      line-height: 78rpx;
+      background-color: #00acff;
+      color: #fff;
+      font-size: 14px;
+      border: 0 none;
+      border-radius: 14rpx;
+      flex-grow: 1;
+      margin-right: 10rpx;
+    }
+
+    button:last-child {
+      margin-left: 10rpx;
+      margin-right: 0;
+    }
+
+    .button-hover {
+      opacity: .8;
+    }
+
+    button.go-back {
+      background-color: #ccc;
+      color: #353535;
+    }
+
+    .checkbox{
+      display: inline-block;
+      margin: 5px 10px 5px 0;
+    }
+  }
+</style>
+
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+  <view class="row">
+      <view class="row-label">单别：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{ta001}}" @input="handleInputTa001"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">单号：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{ta002}}" @input="handleInputTa002"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">品名：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{ta034}}" @input="handleInputTa034"/>
+      </view>
+    </view>
+        <view class="row">
+      <view class="row-label">规格：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{ta035}}" @input="handleInputta035"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">状态：</view>
+      <view class="row-content">
+        <picker mode="selector" range="{{statuses}}" range-key="{{'sa'}}" value="{{index}}" @change="handleChangeStatus">
+          <view class="input">
+            {{statusName}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">从：</view>
+      <view class="row-content">
+        <picker mode="date" value="{{startYmd}}"  @change="handleChangeStart">
+          <view class="picker">
+            当前选择: {{startYmd}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">到：</view>
+      <view class="row-content">
+        <picker mode="date" value="{{endYmd}}"  @change="handleChangeEnd">
+          <view class="picker">
+            当前选择: {{endYmd}}
+          </view>
+        </picker>
+      </view>
+    </view>
+
+
+    <view class="row">
+      <view class="btn-row">
+        <button hover-class="button-hover" @tap="handleSearch">搜索</button>
+        <button type="default" class="go-back" hover-class="button-hover" @tap="handleGoBak">返回</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import moctaApi from '../api/moctaApi';
+  import Auth from '../mixins/Auth';
+
+  export default class MoctaSearch extends wepy.page {
+    config = {
+      navigationBarTitleText: '工单多条件查询'
+    };
+
+    components = {
+    };
+
+    mixins = [Auth];
+
+    data = {
+      minHeight: 0,
+      statusName: '',
+      ta002: '',
+      ta034: '',
+      ta035: '',
+      ta026: '',
+      ta027: '',
+      ta028: '',
+      ta011: '',
+      ta001: '',
+      startYmd :'',
+      endYmd :'',
+      statuses: [{sa:'未完工',sv:'N'},{sa:'已完工',sv:'Y'},{sa:'指定结束',sv:'y'}]
+    };
+
+    methods = {
+      handleInputTa001 (e) {
+        this.ta001 = e.detail.value;
+      },
+      handleInputTa002 (e) {
+        this.ta002 = e.detail.value;
+      },
+      handleInputTa034 (e) {
+        this.ta034 = e.detail.value;
+        console.log(this.ta034);
+      },
+      handleInputta035 (e) {
+        this.ta035 = e.detail.value;
+        console.log(this.ta035);
+      },
+
+      handleChangeEnd(e){
+        this.endYmd = e.detail.value;
+      },
+      handleChangeStart(e){
+        this.startYmd = e.detail.value;
+      },
+      handleChangeStatus (e) {
+        const index = parseInt(e.detail.value);
+        this.statusName = this.statuses[index].sa;
+        this.ta011 = this.statuses[index].sv;
+      },
+
+      handleSearch () {
+        wepy.redirectTo({
+          url: `./mocta?type=1&keyword=${this.ta002}&ta034=${this.ta034}&ta035=${this.ta035}&ta001=${this.ta001}&ta011=${this.ta011}&startYmd=${this.startYmd}&endYmd=${this.endYmd}`
+        });
+      },
+      handleGoBak () {
+        wepy.redirectTo({
+          url: './mocta'
+        });
+      },
+    };
+
+    events = {};
+
+    loadData() {
+      this.$apply();
+    }
+
+    onLoad() {
+      const {windowHeight} = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

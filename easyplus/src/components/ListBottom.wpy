@@ -1,0 +1,43 @@
+<style>
+  .more{
+    margin: 20rpx 30rpx;
+    width: 690rpx;
+    height: 60rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    line-height: 60rpx;
+    font-size: 14px;
+    text-align: center;
+    color: #ccc;
+
+  }
+</style>
+
+<template>
+  <view class="more" wx:if="{{total !== 0 && total === list.length}}">
+    已经到底了，没有更多了。
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+
+  export default class ListBottom extends wepy.component {
+    components = {};
+
+    props = {
+      total: {
+        type: Number
+      },
+      list: {
+        type: Array
+      }
+    };
+
+    data = {};
+
+    methods = {};
+
+    events = {};
+  }
+</script>

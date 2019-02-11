@@ -1,0 +1,191 @@
+<style lang="less">
+  .project-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx 0;
+
+    .project-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10rpx;
+      padding: 20rpx;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        /*height: 50rpx;*/
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+          min-width: 140rpx;
+          font-weight:bold;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          min-width:160rpx;
+          color: #333333;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+      }
+
+    }
+
+    .project-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+
+  .send-message-btn{
+    height: 48rpx;
+    line-height: 48rpx;
+    padding: 0 10rpx;
+    border-radius: 10rpx;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0099ff;
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+    <search-bar :keyword.sync="keyword" @search-confirm.user="handleSearchConfirm"></search-bar>
+    <search-result :total.sync="total" unit="条">
+      <view class="send-message-btn" slot="btn" @tap="handleGoSearch">多条件查询</view>
+    </search-result>
+    <view class="project-list">
+      <view class="project-item" wx:for="{{ list }}">
+          <view class="item-row">
+            <view class="row-label">品号：</view>
+            <view class="row-content wrap">{{item.mC001}}</view>
+                  <view class="row-label">仓库：</view>
+            <view class="row-content wrap">{{item.mC002}}  {{item.storeName}}</view>
+          </view>
+
+          <view class="item-row">
+            <view class="row-label">品名：</view>
+            <view class="row-content wrap">{{item.mB002}}</view>
+                        <view class="row-label">型号：</view>
+            <view class="row-content wrap">{{item.mB003}}</view>
+          </view>
+
+            <view class="item-row">
+            <view class="row-label">数量：</view>
+            <view class="row-content wrap">{{item.mC007}}</view>
+                                    <view class="row-label">包装数量</view>
+            <view class="row-content wrap">{{item.mC014}}</view>
+          </view>
+      </view>
+    </view>
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import storetApi from '../api/storeApi';
+  import SearchBar from '../components/SearchBar';
+  import SearchResult from '../components/SearchResult';
+  import ListBottom from '../components/ListBottom';
+  import Auth from "../mixins/Auth";
+  export default class Store extends wepy.page {
+    config = {
+      navigationBarTitleText: '库存查询'
+    };
+    //引入组件
+    components = {
+      'list-bottom': ListBottom,
+      'search-bar': SearchBar,
+      'search-result': SearchResult
+    };
+    //集成认证
+    mixins = [Auth];
+
+    data = {
+      type: 0,
+      minHeight: 0,
+      total: 0,
+      keyword: '',
+      page: 1,
+      limit: 10,
+      list: [],
+      mb003: '',
+      mc002: '',
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+      handleSearchConfirm(){
+        this.type = 0;
+        this.list = [];
+        this.page = 1;
+        this.loadData();
+      },
+      handleGoSearch () {
+        wepy.redirectTo({
+          url: './storeSearch'
+        });
+      }
+    };
+
+    events = {};
+
+    loadData(){
+      wepy.showLoading();
+      let res;
+      if (this.type === 1) {
+        res = storetApi.getStoreSearch(this.page, this.limit, this.keyword, this.mb003, this.mc002);
+      } else {
+        res = storetApi.getStoreList(this.page, this.limit, this.keyword);
+      }
+    
+      res.then(respone => {    
+        this.total = respone.count;
+        this.list = [
+          ...this.list,
+          ...respone.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+      this.page++;
+      this.loadData();
+    }
+
+    onLoad(query) {
+      const { windowHeight } = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.keyword = query.keyword || '';
+      this.page = query.page ? parseInt(query.page) : 1;
+      if(query.type && query.type === '1') {
+        this.type = 1;
+        this.keyword = query.keyword || '';
+        this.mb003 = query.mb003 || '';
+        this.mc002 = query.mc002 || '';
+      }
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

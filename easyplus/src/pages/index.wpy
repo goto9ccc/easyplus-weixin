@@ -1,0 +1,400 @@
+<style lang="less">
+  .total-data{
+    width: 690rpx;
+    height: 390rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    margin-top: 16rpx;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    .data-item{
+      width: 345rpx;
+      height: 130rpx;
+      box-sizing: border-box;
+      padding: 19rpx 0 19rpx 54rpx;
+    }
+
+    .item-link{
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: flex-start;
+    }
+
+    .data-item:nth-child(2n+1){
+      border-right: 1rpx solid #eeeeee;;
+      border-bottom: 1rpx solid #eeeeee;
+    }
+    .data-item:nth-child(2n){
+      border-bottom: 1rpx solid #eeeeee;
+    }
+    .data-item:nth-child(5),
+    .data-item:nth-child(6){
+      border-bottom: 0 none;
+    }
+  }
+
+  .item-link {
+    .item-icon{
+      width: 90rpx;
+      height: 90rpx;
+    }
+    .item-txt{
+      margin-left: 10rpx;
+      .title{
+        display: block;
+        font-size: 15px;
+        color: #333333;
+      }
+
+      .txt{
+        display: block;
+        font-size: 12px;
+        color: #333333;
+        .number{
+          font-size: 17px;
+          font-weight: 700;
+          color: #ff6600;
+          display: inline;
+        }
+      }
+    }
+  }
+
+  .chart-tabs{
+    margin-top: 10rpx;
+    width: 690rpx;
+    height: 400rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    .tabs-header{
+      width: 100%;
+      height: 80rpx;
+      line-height: 80rpx;
+      box-sizing: border-box;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
+      .header-item{
+        height: 100%;
+        width: 50%;
+        box-sizing: border-box;
+        text-align: center;
+        border-bottom: 1rpx solid #e5e5e5;
+        font-size: 16px;
+        color: #666666;
+      }
+      .header-item.on{
+        border-bottom: 3rpx solid #5382ee;
+        color: #0066cc;
+      }
+    }
+
+    .tabs-content{
+      width: 100%;
+      height: 370rpx;
+      .content-item{
+        display: none;
+        height: 370rpx;
+        width: 100%;
+        .chart-title{
+          width: 100%;
+          line-height: 60rpx;
+          height: 60rpx;
+          font-size: 12px;
+          text-align: center;
+        }
+        .chart-canvas{
+          width: 100%;
+          height: 310rpx;
+          margin: 0 auto;
+        }
+      }
+      .content-item.on{
+        display: block;
+      }
+    }
+  }
+
+  .index-nav{
+    margin-top: 10rpx;
+    width: 690rpx;
+    background-color: #fff;
+    border-radius: 16rpx 16rpx 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    .nav-item{
+      width: 230rpx;
+      height: 170rpx;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 20rpx 0;
+      .nav-icon{
+        width: 90rpx;
+        height: 90rpx;
+        display: block;
+        margin: 0 auto;
+      }
+      .nav-name{
+        font-size: 14px;
+        color: #333333;
+        line-height: 40rpx;
+      }
+    }
+  }
+
+  .remind-wrap {
+    margin-top: 20rpx;
+    box-sizing: border-box;
+    width: 690rpx;
+    padding: 0 30rpx;
+    font-size: 14px;
+    color: #353535;
+    line-height: 88rpx;
+    background-color: #fff;
+    border-radius: 16rpx;
+    position: relative;
+    display: none;
+
+    .red {
+      color: red;
+    }
+
+    .close {
+      position: absolute;
+      top: 10rpx;
+      right: 10rpx;
+      width: 30rpx;
+      height: 30rpx;
+      line-height: 30rpx;
+      padding: 20rpx;
+      color: #eee;
+    }
+  }
+
+  .remind-wrap.on {
+    display: block;
+  }
+  page{
+    background-color:#eee;
+  }
+</style>
+<template>
+  <view class="wrapper">
+    <view class="total-data">
+      <view class="data-item">
+        <navigator class="item-link" url="./coptd?td016=N&type=1&td013={{currentdate}}">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-1.png"></image>
+          <view class="item-txt">
+            <view class="title">超交期订单</view>
+            <view class="txt"><text class="number">{{total[0]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./mocta?ta011=N&type=1">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-2.png"></image>
+          <view class="item-txt">
+            <view class="title">未完工工单</view>
+            <view class="txt"><text class="number">{{total[1]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./coptd?td016=N&type=1">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-3.png"></image>
+          <view class="item-txt">
+            <view class="title">未交付订单</view>
+            <view class="txt"><text class="number">{{total[2]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./copth">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-4.png"></image>
+          <view class="item-txt">
+            <view class="title">本月销售</view>
+            <view class="txt"><text class="number">{{total[3]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./store">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-5.png"></image>
+          <view class="item-txt">
+            <view class="title">库存重量</view>
+            <view class="txt"><text class="number">{{total[4]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+      <view class="data-item">
+        <navigator class="item-link" url="./copma">
+          <image class="item-icon" mode="aspectFit" src="../assets/images/index-data-6.png"></image>
+          <view class="item-txt">
+            <view class="title">客户总数</view>
+            <view class="txt"><text class="number">{{total[5]}}</text></view>
+          </view>
+        </navigator>
+      </view>
+    </view>
+
+    <view class="chart-tabs">
+      <view class="tabs-content">
+        <view class="content-item on">
+          <view class="chart-title">本年销售分月</view>
+          <canvas class="chart-canvas on" canvas-id="serviceCanvas"></canvas>
+        </view>
+      </view>
+    </view>
+
+    <view class="index-nav">
+      <view class="nav-item">
+        <navigator url="./store">
+          <image class="nav-icon" src="../assets/images/nav-3.png"></image>
+          <view class="nav-name">库存查询</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./coptd">
+          <image class="nav-icon" src="../assets/images/nav-1.png"></image>
+          <view class="nav-name">订单查询</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./mocta">
+          <image class="nav-icon" src="../assets/images/nav-7.png"></image>
+          <view class="nav-name">工单查询</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./copma">
+          <image class="nav-icon" src="../assets/images/nav-5.png"></image>
+          <view class="nav-name">客户查询</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./nofinish">
+          <image class="nav-icon" src="../assets/images/nav-10.png"></image>
+          <view class="nav-name">制造执行</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./exprotSaleIndex">
+          <image class="nav-icon" src="../assets/images/nav-8.png"></image>
+          <view class="nav-name">外销专题</view>
+        </navigator>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import wxCharts from '../lib/wxcharts';
+  import indexApi from '../api/indexApi';
+  import Auth from '../mixins/Auth';
+  export default class Index extends wepy.page {
+    config = {
+      navigationBarTitleText: '首页'
+    }
+    components = {
+
+    }
+    data = {
+      tabName: 'industry',
+      searchKey: '',
+      total: [0, 0, 0, 0, 0, 0],
+      remind: 0,
+      currentdate:''
+    }
+
+    mixins = [Auth];
+    //计算属性
+    computed = {
+      testComput : function(){ return 1+1}
+
+    }
+
+    methods = {
+    }
+
+    getNowFormatDate() {
+        let date = new Date();
+        let seperator1 = "-";
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let strDate = date.getDate();
+        if (month >= 1 && month <= 9) {
+            month = "0" + month;
+        }
+        if (strDate >= 0 && strDate <= 9) {
+            strDate = "0" + strDate;
+        }
+        let currentdate = year + seperator1 + month + seperator1 + strDate;
+        return currentdate;
+    }
+
+
+    onLoad() {
+      this.auth().then(()=>{
+      const { windowWidth } = this.$parent.getSystemInfo();
+      this.currentdate = this.getNowFormatDate();
+      const rpx = windowWidth / 750;
+      let lineChart = {     //定义一个wxCharts图表实例
+            canvasId: 'serviceCanvas',     //输入wxml中canvas的id
+            type: 'column',       //图标展示的类型有:'line','pie','column','area','ring','radar'
+            categories: [],    //模拟的x轴横坐标参数
+            animation: true,  //是否开启动画
+            legend: false,
+            series: [{   //具体坐标数据
+              name: '销售',  //名字
+              data: [],  //数据点
+              format: function (val, name) {  //点击显示的数据注释
+                return val.toFixed(2) + '元';
+              }
+            }
+            ],
+            xAxis: {   //是否隐藏x轴分割线
+              disableGrid: true,
+            },
+            yAxis:{
+              min:0,
+              format:function(val,name){
+                return '';
+              }
+            },
+            width: 690 * rpx,
+            height: 310 * rpx,           
+            dataLabel: true,  //是否在图表上直接显示数据
+          }
+
+      Promise.all([
+          indexApi.getIndexCount(),
+          indexApi.getYearsale(),
+        ]).then(datas=>{
+          this.total[0] = datas[0].invmcCount;
+          this.total[1] = datas[0].moctaCount;
+          this.total[2] = datas[0].coptdCount;
+          this.total[3] = datas[0].copthCount;
+          this.total[4] = datas[0].invmcWeight;
+          this.total[5] = datas[0].copmaCount;
+          lineChart.categories = datas[1].months;
+          lineChart.series[0].data = datas[1].values;
+          new wxCharts(lineChart);
+          this.$apply();
+        });
+      });
+    }
+  }
+</script>

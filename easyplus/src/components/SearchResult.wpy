@@ -1,0 +1,37 @@
+<style lang="less">
+
+</style>
+
+<template>
+  <view class="search-result">
+    <view class="result-txt">
+      共找到符合条件的<text class="result-number">{{total}}</text>{{unit}}
+    </view>
+
+    <slot name="btn">
+
+    </slot>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+
+  export default class SearchResult extends wepy.component {
+
+    props = {
+      total: {
+        type: Number
+      },
+      unit: {
+        type: String
+      }
+    };
+
+    computed = {};
+
+    methods = {};
+
+    events = {};
+  }
+</script>

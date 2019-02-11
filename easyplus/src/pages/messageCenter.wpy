@@ -1,0 +1,203 @@
+<style lang="less">
+
+  .search-result{
+    height: 90rpx;
+    line-height: 90rpx;
+
+    .btn-list {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .send-message-btn{
+      height: 58rpx;
+      line-height: 58rpx;
+      padding: 0  10rpx;
+      border-radius: 10rpx;
+      font-size: 12px;
+      color: #fff;
+      background-color: #0099ff;
+      margin-right: 10px;
+    }
+    .send-message-btn:last-child {
+      margin-right: 0;
+    }
+
+  }
+
+  .contacts-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx;
+
+    .contacts-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 20rpx;
+      padding: 19rpx 60rpx;
+      background-color: #fff;
+      border-radius: 16rpx;
+      position: relative;
+      overflow: hidden;
+
+      .select{
+        width: 55rpx;
+        height: 40rpx;
+        position: absolute;
+        top: 0;
+        left: 0;
+
+        .select-icon{
+          width: 55rpx;
+          height: 40rpx;
+        }
+      }
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+          width: 120rpx;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #0066cc;
+        }
+
+        .row-content.tel{
+          text-decoration: underline;
+
+          .tel-icon{
+            width: 28rpx;
+            height: 26rpx;
+          }
+        }
+      }
+
+    }
+
+    .contacts-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+  .title-box{
+    text-align:center;
+    padding:10rpx;
+    .title{
+      font-size:30rpx;
+      line-height:30rpx;
+      display:inline-block;
+    }
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px">
+    <view class="contacts-list">       
+      <view class="contacts-item" wx:for="{{ list }}" wx:for-index="i" wx:for-item="item" wx:key="item.id" >
+     <navigator url="./messageDetail?id={{item.id}}">
+        <view class="item-row">
+          <view class="row-label">发件人：</view>
+          <view class="row-content">{{item.sender}}</view>
+        </view>
+        <view class="item-row" >
+          <view class="row-label">时间：</view>
+          <view class="row-content">{{item.createTime}}</view>
+        </view>
+        <view class="item-row">
+          <view class="row-label">标题：</view>
+          <view class="row-content " >{{item.title}}</view>
+        </view>
+        </navigator>
+      </view>
+
+    </view>
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import messageApi from '../api/messageApi';
+  import ListBottom from '../components/ListBottom';
+  import Auth from '../mixins/Auth';
+
+  export default class MessageCenter extends wepy.page {
+    config = {
+      navigationBarTitleText: '消息中心'
+    };
+
+    components = {
+      'list-bottom': ListBottom,
+    };
+
+    mixins = [Auth];
+
+    data = {
+      minHeight: 0,
+      total: 0,
+      keyword: '',
+      pageIndex: 1,
+      pageSize: 100,
+      list: [],
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+      handleSearchConfirm(){
+        this.list = [];
+        this.pageIndex = 1;
+        this.loadData();
+      },
+    };
+
+    events = {};
+
+    loadData(){
+      wepy.showLoading();
+      messageApi.getList(this.pageIndex, this.pageSize, this.keyword).then(data => {
+        console.log(data);
+        this.total = data.count;
+        this.list = [
+          ...this.list,
+          ...data.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+      this.pageIndex++;
+      this.loadData();
+    }
+
+    onLoad(query) {
+      const { windowHeight } = this.$parent.getSystemInfo();
+      const { windowWidth } = this.$parent.getSystemInfo();
+      const rpx = windowWidth / 750;
+      this.minHeight = windowHeight;
+      this.keyword = query.keyword || '';
+      this.pageIndex = query.pageIndex ? parseInt(query.pageIndex) : 1;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

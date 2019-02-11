@@ -1,0 +1,172 @@
+<style lang="less">
+  .project-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx 0;
+
+    .project-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10rpx;
+      padding: 20rpx;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        /*height: 50rpx;*/
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+         min-width: 140rpx;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #333333;
+          min-width:180rpx;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+        .row-content-detail{
+        font-size: 15px;
+          color: #333333;
+          min-width:180rpx;  
+        }
+      }
+
+    }
+
+    .project-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+  .warring{
+    color:red;
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+    <view class="project-list">
+      <view class="project-item" wx:for="{{ list }}">
+           <navigator class="item-link" url="./moctaDetail?type=1&td001={{item.tC001}}&td002={{item.tC002}}&td003={{item.tD003}}">
+        <view class="item-row">
+            <view class="row-label">订单编号：</view>
+            <view class="row-content wrap">{{item.tC001}}-{{item.tC002}}-{{item.tD003}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">牌号：</view>
+            <view class="row-content wrap">{{item.tD005}}</view>
+          </view>
+            <view class="item-row">
+            <view class="row-label">规格：</view>
+            <view class="row-content wrap">{{item.tD006}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">订单数量：</view>
+            <view class="row-content wrap">{{item.tD008}}</view>
+            <view class="row-label">已交数量：</view>
+            <view class="row-content wrap">{{item.tD009}}</view>
+          </view>
+    <view class="item-row">
+            <view class="row-label">预交货日：</view>
+            <view class="row-content wrap">{{item.tD013}}</view>
+                        <view class="row-label">库存数量：</view>
+            <view class="row-content wrap">{{item.udF51}}</view>
+          </view>
+        <view class="item-row">
+            <view class="row-label">生产情况：</view>
+            <view class="row-content-detail wrap">{{item.udF01}}</view>
+          </view>
+     </navigator>
+      </view>
+    </view>
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import exportCoptdApi from '../api/exportCoptdApi';
+  import ListBottom from '../components/ListBottom';
+  import Auth from "../mixins/Auth";
+  export default class ExportSaleCoptd extends wepy.page {
+    config = {
+      navigationBarTitleText: '未完工订单查询'
+    };
+    //引入组件
+    components = {
+      'list-bottom': ListBottom,
+    };
+    //集成认证
+    mixins = [Auth];
+
+    data = {
+      type: 0,
+      minHeight: 0,
+      total: 0,
+      keyword: '',
+      page: 1,
+      limit: 10,
+      list: [],
+      tc003: '',
+      td016: '',
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+    };
+
+    events = {};
+
+    loadData(){
+      wepy.showLoading();
+      let res;
+      res = exportCoptdApi.getCoptdList(this.page, this.limit, this.tc003, this.td016);     
+      res.then(respone => {    
+        this.total = respone.count;
+        respone.data.forEach((item,index)=>{
+
+        });
+        this.list = [
+          ...this.list,
+          ...respone.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+      this.page++;
+      this.loadData();
+    }
+
+    onLoad(query) {
+      const { windowHeight } = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.keyword = query.keyword || '';
+      this.page = query.page ? parseInt(query.page) : 1;
+      this.tc003 = query.tc003.trim() || '';
+      this.td016 = query.td016 || '';
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

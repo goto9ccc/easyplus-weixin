@@ -1,0 +1,268 @@
+<style lang="less">
+  .project-list{
+    box-sizing: border-box;
+    width: 100%;
+    padding: 0 30rpx 0;
+
+    .project-item{
+      box-sizing: border-box;
+      width: 100%;
+      margin-bottom: 10rpx;
+      padding: 20rpx;
+      background-color: #fff;
+      position: relative;
+      overflow: hidden;
+
+      .item-row{
+        box-sizing: border-box;
+        width: 100%;
+        /*height: 50rpx;*/
+        line-height: 50rpx;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        align-items: flex-start;
+
+        .row-label{
+          font-size: 15px;
+         min-width: 140rpx;
+          color: #666666;
+        }
+
+        .row-content{
+          font-size: 15px;
+          color: #333333;
+          min-width:160rpx;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
+        }
+
+      }
+
+    }
+
+    .project-item:last-child{
+      margin-bottom: 0;
+    }
+  }
+
+  .send-message-btn{
+    height: 48rpx;
+    line-height: 48rpx;
+    padding: 0 10rpx;
+    border-radius: 10rpx;
+    font-size: 12px;
+    color: #fff;
+    background-color: #0099ff;
+  }
+  .progress{
+    background-color:#1cc51b;
+    height:20rpx;
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+    <search-bar :keyword.sync="keyword" @search-confirm.user="handleSearchConfirm"></search-bar>
+    <search-result :total.sync="total" unit="条">
+      <view class="send-message-btn" slot="btn" @tap="handleGoSearch">多条件查询</view>
+    </search-result>
+    <view class="project-list">
+      <view class="project-item" wx:for="{{ list }}">
+      <navigator class="item-link" url="./moctaDetail?type=0&ta001={{item.tA001}}&ta002={{item.tA002}}">
+          <view class="item-row">
+            <view class="row-label">单别：</view>
+            <view class="row-content wrap">{{item.tA001}}-{{item.tA002}}</view>
+          </view>
+          <view class="item-row">
+            <view class="row-label">开单日期：</view>
+            <view class="row-content wrap">{{item.tA003}}</view>
+            <view class="row-label">状态：</view>
+            <view class="row-content wrap" style="{{item.color}}">{{item.tA011}}</view>
+          </view>
+          <view class="item-row">
+            <view class="row-label">牌号：</view>
+            <view class="row-content wrap">{{item.tA034}}</view>
+          </view>      
+          <view class="item-row">
+            <view class="row-label">规格：</view>
+            <view class="row-content wrap">{{item.tA035}}</view>
+          </view>      
+          <view class="item-row">
+            <view class="row-label">预计开工：</view>
+            <view class="row-content wrap">{{item.tA009}}</view>
+            <view class="row-label">预计完工：</view>
+            <view class="row-content wrap">{{item.tA010}}</view>
+          </view> 
+          <view class="item-row">
+            <view class="row-label">实际开工：</view>
+            <view class="row-content wrap">{{item.tA012}}</view>
+            <view class="row-label">实际完工：</view>
+            <view class="row-content wrap">{{item.tA014}}</view>
+          </view> 
+          <view class="item-row">
+            <view class="row-label">预计产量：</view>
+            <view class="row-content wrap">{{item.tA015}}</view>
+            <view class="row-label">已生产量：</view>
+            <view class="row-content wrap">{{item.tA017}}</view>
+          </view>   
+            <view class="item-row">
+            <view class="row-label">完成率：</view>
+             <view class="row-content wrap">{{item.rate}}</view>
+          </view> 
+           <view class="item-row">
+               <view class="progress" style="width:{{item.widthstyle}};">
+               </view>
+          </view>          
+          </navigator>
+      </view>
+    </view>
+    <list-bottom :total.sync="total" :list.sync="list"></list-bottom>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import moctaApi from '../api/moctaApi';
+  import SearchBar from '../components/SearchBar';
+  import SearchResult from '../components/SearchResult';
+  import ListBottom from '../components/ListBottom';
+  import Auth from "../mixins/Auth";
+  export default class Mocta extends wepy.page {
+    config = {
+      navigationBarTitleText: '工单查询'
+    };
+    //引入组件
+    components = {
+      'list-bottom': ListBottom,
+      'search-bar': SearchBar,
+      'search-result': SearchResult
+    };
+    //集成认证
+    mixins = [Auth];
+
+    data = {
+      type: 0,
+      minHeight: 0,
+      total: 0,
+      keyword: '',//ta001
+      page: 1,
+      limit: 10,
+      list: [],
+      ta002: '',
+      ta034: '',
+      ta035: '',
+      ta026: '',
+      ta027: '',
+      ta028: '',
+      ta011: '',
+      startYmd :'',
+      endYmd :'',
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+      handleSearchConfirm(){
+        this.type = 0;
+        this.list = [];
+        this.page = 1;
+        this.loadData();
+      },
+      handleGoSearch () {
+        wepy.redirectTo({
+          url: './moctaSearch'
+        });
+      }
+    };
+
+    events = {};
+
+    loadData(){
+      wepy.showLoading();
+      let res;
+      if (this.type === 1) {
+        res = moctaApi.getMoctaSearch(this.page, this.limit, this.keyword,this.ta001,this.ta034,this.ta035,this.ta011,this.startYmd,this.endYmd);
+      } else {
+        res = moctaApi.getMoctaList(this.page, this.limit, this.keyword);
+      }
+    
+      res.then(respone => {    
+        this.total = respone.count;
+        respone.data.forEach((item,index)=>{
+          if(item.tA003.length >=8){
+            item.tA003 = item.tA003.substring(0,4) + '-' + item.tA003.substring(4,6) + '-' + item.tA003.substring(6,8)
+          }
+          if(item.tA009.length >=8){
+            item.tA009 = item.tA009.substring(0,4) + '-' + item.tA009.substring(4,6) + '-' + item.tA009.substring(6,8)
+          }
+          if(item.tA010.length >=8){
+            item.tA010 = item.tA010.substring(0,4) + '-' + item.tA010.substring(4,6) + '-' + item.tA010.substring(6,8)
+          }
+          if(item.tA012.length >=8){
+            item.tA012 = item.tA012.substring(0,4) + '-' + item.tA012.substring(4,6) + '-' + item.tA012.substring(6,8)
+          }
+          if(item.tA014.length >=8){
+            item.tA014 = item.tA014.substring(0,4) + '-' + item.tA014.substring(4,6) + '-' + item.tA014.substring(6,8)
+          }
+          item.color = '';
+          if(item.tA011 == '1'){
+            item.tA011 = '未生产'
+            item.color = 'color:red;'
+          }
+          if(item.tA011 == '2'){
+            item.tA011 = '已领料'
+          } 
+          if(item.tA011 == '3'){
+            item.tA011 = '生产中'
+          } 
+          if(item.tA011 == 'Y'){
+            item.tA011 = '已完工'
+            item.color = 'color:green;'
+          }
+          if(item.tA011 == 'y'){
+            item.tA011 = '指定完工'
+          } 
+          item.rate = (item.tA017 /item.tA015).toFixed(2);  
+          item.widthstyle = (item.rate * 100) + '%';         
+        });
+        this.list = [
+          ...this.list,
+          ...respone.data
+        ];
+        this.$apply();
+        wepy.hideLoading();
+      });
+    }
+
+    onReachBottom () {
+      if(this.list.length === this.total){
+        return;
+      }
+      this.page++;
+      this.loadData();
+    }
+
+    onLoad(query) {
+      const { windowHeight } = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.keyword = query.keyword || '';
+      this.page = query.page ? parseInt(query.page) : 1;
+      if(query.type && query.type === '1') {
+        this.type = 1;
+        this.keyword = query.keyword || '';
+        this.ta001 = query.ta001 || '';
+        this.ta011 = query.ta011 || '';
+        this.ta034 = query.ta034 || '';
+        this.ta035 = query.ta035 || '';
+        this.startYmd = query.startYmd || '';
+        this.endYmd = query.endYmd || '';
+      }
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

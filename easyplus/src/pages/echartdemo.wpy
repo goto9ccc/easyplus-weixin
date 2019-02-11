@@ -1,0 +1,91 @@
+<style type="css">
+.container_chart {
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    box-sizing:border-box;
+    padding:10px;
+}
+.chart_re{
+    position:relative;
+    height:300px;
+    padding:10px;
+}
+</style>
+<template>
+    <view class="chart_re">
+        <view class="container_chart" >
+        <echarts  :ec="ec" />
+    </view>
+    </view>
+
+</template>
+<script>
+import wepy from 'wepy';
+import Echarts from '../components/echart';
+
+export default class echartdemo extends wepy.page {
+
+    config = {
+        'navigationBarTitleText': '示例'
+    };
+
+    components = {
+        echarts: Echarts,
+    }
+
+    data = {
+        ec: {
+            option: {
+                backgroundColor: "#ffffff",
+                /*
+                legend: {
+                    orient : 'vertical',
+                    x : 'left',
+                    data:['新材料','新能源与节能环保','电子信息','先进装备制造','现代服务业','生物医药']
+                },
+                */
+                series : [
+                    {
+                        name:'园区产业分布',
+                        type:'pie',
+                        radius : '55%',
+                        center: ['50%', '60%'],
+                        label: {
+                            normal: {
+                                show: true,
+                                formatter: '{b}: {c}'
+                            }
+                        },
+                        data:[
+                            {value:332, name:'新材料'},
+                            {value:702, name:'新能源与节能环保'},
+                            {value:12512, name:'电子信息'},
+                            {value:333, name:'先进装备制造'},
+                            {value:7682, name:'现代服务业'},
+                            {value:1132, name:'先进装备制造'}
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+
+    methods = {
+
+    }
+    onShow () {
+
+    }
+    onLoad () {
+
+    }
+
+}
+</script>

@@ -1,0 +1,205 @@
+<style lang="less">
+  .login-header{
+    box-sizing: border-box;
+    width: 100%;
+    height: 480rpx;
+    position: relative;
+
+    .bg-img {
+      width: 100%;
+      height: 100%;
+    }
+
+    .logo-wrapper {
+      position: absolute;
+      top: 100rpx;
+      left: 50%;
+      width: 130rpx;
+      height: 130rpx;
+      margin-left: -65rpx;
+
+      .logo {
+        width: 100%;
+        height: 100%;
+
+      }
+    }
+
+    .title {
+      position: absolute;
+      top: 250rpx;
+      left: 0;
+      right: 0;
+      line-height: 80rpx;
+      font-size: 20px;
+      font-weight: 700;
+      text-align: center;
+      color: #fff;
+    }
+  }
+
+  .login-form {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 20rpx 80rpx;
+
+    .form-row {
+      box-sizing: border-box;
+      width: 100%;
+      height: 88rpx;
+      line-height: 88rpx;
+      margin-bottom: 60rpx;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: flex-start;
+
+      input {
+        box-sizing: border-box;
+        height: 88rpx;
+        line-height: 66rpx;
+        padding: 10rpx;
+        border: 1rpx solid #eee;
+        font-size: 16px;
+        color: #353535;
+        border-radius: 14rpx;
+        flex-grow: 1;
+
+      }
+      button {
+        box-sizing: border-box;
+        height: 88rpx;
+        line-height: 88rpx;
+        background-color: #00acff;
+        color: #fff;
+        font-size: 16px;
+        border: 0 none;
+        border-radius: 14rpx;
+        flex-grow: 1;
+      }
+
+      .button-hover {
+        opacity: .8;
+      }
+    }
+
+    .form-row:last-child {
+      margin-bottom: 0;
+    }
+  }
+</style>
+
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px; background-color: #fff;">
+    <view class="login-header">
+      <image mode="scaleToFill" src="../assets/images/login-bg.png" class="bg-img"></image>
+
+      <view class="logo-wrapper">
+        <image class="logo" mode="aspectFit" src="../assets/images/ic_launcher_round-web.png"></image>
+      </view>
+
+      <view class="title">
+        EasyPlus 用户登录
+      </view>
+    </view>
+
+    <view class="login-form">
+      <view class="form-row">
+        <input placeholder="请输入用户名" value="{{user}}" @input="handleUserInput"/>
+      </view>
+      <view class="form-row">
+        <input type="password" placeholder="请输入密码"  value="{{password}}" @input="handlePasswordInput"/>
+      </view>
+      <view class="form-row">
+        <button hover-class="button-hover" @tap="handleLogin">登录</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import userApi from '../api/userApi'
+  import request from '../api/request'
+
+  export default class Login extends wepy.page {
+    config = {
+      navigationBarTitleText: '使用ERP帐户登录'
+    };
+    components = {};
+
+    mixins = [];
+
+    data = {
+      minHeight: 0,
+      user: '',
+      password: ''
+    };
+
+    computed = {};
+
+    methods = {
+      handleUserInput (event) {
+        this.user = event.detail.value;
+      },
+      handlePasswordInput (event) {
+        this.password = event.detail.value;
+      },
+
+      handleLogin () {
+        wepy.login().then(res => {
+          return userApi.login(this.user, this.password, res.code)
+        }).then(res => {
+          console.log(res)
+          request.setToken(res.token)
+          wepy.showToast({
+            title: '登录成功！',
+            icon: 'success',
+            duration: 2000
+          }).then(() => {
+            wepy.switchTab({
+              url: '/pages/index'
+            })
+          });
+        }).catch(e => {
+          wepy.showModal({
+            title: '提示',
+            content: '网络或接口异常',
+            showCancel: false
+          });
+        })
+      },
+    };
+
+    dountDown () {
+      let second = 60,
+        that = this;
+
+      this.yzmDisable = true;
+
+      this.$apply();
+
+      let i = setInterval(() => {
+        if(second === 0) {
+          that.yzmTitle = '获取验证码';
+          that.yzmDisable = false;
+          clearInterval(i);
+          that.$apply();
+          return;
+        }
+        that.yzmTitle = second + '秒后重发';
+        second--;
+        that.$apply();
+      }, 1000);
+    }
+
+    events = {};
+
+    onLoad() {
+      const {windowHeight} = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      //this.phone = '13142010118';
+    }
+  }
+</script>

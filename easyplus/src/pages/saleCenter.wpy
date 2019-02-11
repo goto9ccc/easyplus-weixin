@@ -1,0 +1,88 @@
+<style lang="less">
+  .index-nav{
+    margin-top: 20rpx;
+    width: 690rpx;
+    background-color: #fff;
+    border-radius: 16rpx 16rpx 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: flex-start;
+    .nav-item{
+      width: 230rpx;
+      height: 170rpx;
+      box-sizing: border-box;
+      text-align: center;
+      padding: 20rpx 0;
+      .nav-icon{
+        width: 90rpx;
+        height: 90rpx;
+        display: block;
+        margin: 0 auto;
+      }
+      .nav-name{
+        font-size: 14px;
+        color: #333333;
+        line-height: 40rpx;
+      }
+    }
+  }
+  .wrapper{
+      background-color:#fff;
+  }
+</style>
+<template>
+  <view class="wrapper">
+    <view class="index-nav">
+      <view class="nav-item">
+        <navigator url="./echartCostomer">
+          <image class="nav-icon" src="../assets/images/nav-3.png"></image>
+          <view class="nav-name">我的订单</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./echartInvma">
+          <image class="nav-icon" src="../assets/images/nav-1.png"></image>
+          <view class="nav-name">我的客户</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./innovate">
+          <image class="nav-icon" src="../assets/images/nav-7.png"></image>
+          <view class="nav-name">库存查询</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./landedEstate">
+          <image class="nav-icon" src="../assets/images/nav-5.png"></image>
+          <view class="nav-name">工作日志</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./dynamic">
+          <image class="nav-icon" src="../assets/images/nav-10.png"></image>
+          <view class="nav-name">应收帐款</view>
+        </navigator>
+      </view>
+      <view class="nav-item">
+        <navigator url="./echartdemo">
+          <image class="nav-icon" src="../assets/images/nav-8.png"></image>
+          <view class="nav-name">回款记录</view>
+        </navigator>
+      </view>
+    </view>
+       </view>
+</template>
+<script>
+    import wepy from 'wepy'
+    import Auth from '../mixins/Auth';
+    export default class SaleCenter extends wepy.page {
+    config = {
+      navigationBarTitleText: '销售中心'
+    }
+    components = {
+
+    }
+    }
+</script>

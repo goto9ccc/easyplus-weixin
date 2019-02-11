@@ -1,0 +1,130 @@
+<style type="css">
+.container_chart {
+    position:absolute;
+    top:0;
+    bottom:0;
+    left:0;
+    right:0;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    box-sizing:border-box;
+    padding:10px;
+}
+.chart_re{
+    position:relative;
+    height:650px;
+    padding:10px;
+}
+</style>
+<template>
+    <view class="chart_re">
+        <view class="container_chart" >
+        <echarts  :ec="ec" />
+    </view>
+    </view>
+
+</template>
+<script>
+import wepy from 'wepy';
+import Echarts from '../components/echart';
+import echartsApi from '../api/echartsApi';
+import Auth from "../mixins/Auth";
+
+export default class echartCostomer extends wepy.page {
+
+    config = {
+        'navigationBarTitleText': '年度客户排行'
+    };
+
+    components = {
+        echarts: Echarts,
+    }
+    mixins = [Auth];
+    data = {
+        ec: {
+            lazyLoad :false,
+            option: {
+                title: {
+                    text: ''
+                },
+                tooltip: {
+                    trigger: 'axis',
+                    axisPointer: {
+                        type: 'shadow'
+                    }
+                },
+                legend: {
+                    align:'right',
+                    data: []
+                },
+                grid: {
+                    left: '3%',
+                    right: '4%',
+                    bottom: '3%',
+                    containLabel: true
+                },
+                xAxis: {
+                    type: 'value',
+                    axisLabel:{
+                        rotate: 40,
+                    },
+                    boundaryGap: [0, 0.01]
+                },
+                yAxis: {
+                    type: 'category',
+                    data: []
+                },
+                series: [
+                    {
+                        name: '',
+                        type: 'bar',
+                        label:{
+                            show: true,
+                            position: 'right',
+                        },
+                        data: []
+                    },
+                    {
+                        name: '',
+                        type: 'bar',
+                        label:{
+                            show: true,
+                            position: 'right',
+                        },
+                        data: []
+                    }
+                ]
+            }
+        }
+    }
+
+    methods = {
+
+    }
+    onShow () {
+
+    }
+    loadData () {
+      Promise.all([
+        echartsApi.getTopTen()
+      ]).then(datas => {
+        console.log(datas);
+        this.ec.option.legend.data = datas[0].legend;
+        this.ec.option.yAxis.data = datas[0].costomer;
+        this.ec.option.series[0].name = datas[0].legend[0];
+        this.ec.option.series[0].data = datas[0].sumValue;
+        this.ec.option.series[1].name = datas[0].legend[1];
+        this.ec.option.series[1].data = datas[0].lastValue;  
+        this.$broadcast('reloadchart');    
+        this.$apply();
+      })
+    }
+
+    onLoad () {
+        this.auth().then(() => this.loadData());  
+    }
+
+}
+</script>

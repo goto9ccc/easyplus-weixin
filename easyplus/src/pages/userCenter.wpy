@@ -1,0 +1,223 @@
+<style lang="less">
+  .user-header{
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 20rpx;
+    padding: 30rpx;
+    background-color: #fff;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+
+    .user-avatar{
+      width: 100rpx;
+      height: 100rpx;
+      border-radius: 50%;
+      background-color: #ccc;
+    }
+
+    .user-info{
+      height: 100rpx;
+      padding-left: 20rpx;
+    }
+    .user-name{
+      height: 50rpx;
+      line-height: 50rpx;
+      font-size: 16px;
+      color: #333333;
+    }
+    .user-department{
+      height: 50rpx;
+      line-height: 50rpx;
+      font-size: 14px;
+      color: #666666;
+    }
+  }
+
+  .user-operate-list{
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 20rpx;
+    padding: 0 30rpx;
+    background-color: #fff;
+
+    .operate-item{
+      box-sizing: border-box;
+      width: 100%;
+      height: 88rpx;
+      line-height: 88rpx;
+      border-bottom: 1rpx solid #e5e5e5;
+
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      align-items: center;
+
+      .item-label{
+        padding-left: 20rpx;
+        height: 45rpx;
+        line-height: 45rpx;
+        font-size: 14px;
+        color: #333;
+
+        .label-icon{
+          display: inline-block;
+          margin-right: 10rpx;
+          width: 45rpx;
+          height: 45rpx;
+          line-height: 45rpx;
+          vertical-align: middle;
+        }
+      }
+
+      .item-arrow{
+        width: 16rpx;
+        height: 26rpx;
+        margin-right: 20rpx;
+      }
+    }
+    .operate-item:last-child{
+      border-bottom: 0 none;
+    }
+  }
+  .footer{
+    position: absolute;
+    padding-bottom: 20rpx;
+    bottom: 0rpx;
+    width:100%;
+    font-size: 20rpx;
+    color: #666666;
+  }
+</style>
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px">
+    <view class="user-header">
+      <image class="user-avatar" src="{{avatarUrl}}"></image>
+      <view class="user-info">
+        <view class="user-name">{{name}}</view>
+        <view class="user-department">{{title}}</view>
+      </view>
+    </view>
+
+    <view class="user-operate-list">
+      <view class="operate-item">
+        <navigator class="operate-item" url="./nofinish">
+        <view class="item-label">
+          <image class="label-icon" src="../assets/images/user-4.png"></image>
+          私信
+        </view>
+
+        <image class="item-arrow" src="../assets/images/user-1.png"></image>
+        </navigator>
+      </view>
+     <view>
+     
+    </view>
+      <view class="operate-item">
+        <navigator class="operate-item" url="./contacts">
+        <view class="item-label">
+          <image class="label-icon" src="../assets/images/user-4.png"></image>
+          公司通信录
+        </view>
+        <image class="item-arrow" src="../assets/images/user-1.png"></image>
+        </navigator>
+      </view>
+        <view class="operate-item">
+        <navigator class="operate-item" url="./nofinish">
+        <view class="item-label">
+          <image class="label-icon" src="../assets/images/user-4.png"></image>
+          工作日志
+        </view>
+        <image class="item-arrow" src="../assets/images/user-1.png"></image>
+        </navigator>
+      </view>
+        <view class="operate-item">
+        <navigator class="operate-item" url="./creative">
+        <view class="item-label">
+          <image class="label-icon" src="../assets/images/user-4.png"></image>
+          实验功能
+        </view>
+        <image class="item-arrow" src="../assets/images/user-1.png"></image>
+        </navigator>
+      </view>
+
+      <view class="operate-item" @tap="handleExitLogin">
+        <view class="item-label">
+          <image class="label-icon" src="../assets/images/user-5.png"></image>
+          退出登录
+        </view>
+        <image class="item-arrow" src="../assets/images/user-1.png"></image>
+      </view>
+    </view>
+
+     <view class="footer">
+        <button  open-type="getUserInfo" bindgetuserinfo="getUserInfo">授权获取微信头像</button>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import Auth from '../mixins/Auth';
+  import userApi from '../api/userApi';
+
+  export default class User extends wepy.page {
+    config = {
+      navigationBarTitleText: '用户中心'
+    }
+    components = {
+
+    }
+
+    mixins = [Auth]
+
+    data = {
+      minHeight: 0,
+      avatarUrl: '',
+      name: '',
+      title: ''
+    }
+
+    computed = {
+
+    }
+
+    methods = {
+      handleExitLogin (e) {
+        wx.redirectTo({
+          url: 'login'
+        })
+      }
+    };
+
+    events = {}
+
+    loadData () {
+      Promise.all([
+        wepy.getUserInfo(),
+        userApi.getUser(),
+      ]).then(datas => {
+        console.log(datas);
+        this.avatarUrl = datas[0].userInfo.avatarUrl;
+        this.name = datas[1].userName;
+        this.title = datas[1].deptName;
+        this.$apply();
+      }).catch(e => {
+          wepy.showModal({
+            title: '提示',
+            content: '请点击授权按纽获得头像',
+            showCancel: true
+          });
+        })
+    }
+
+    onLoad() {
+      const { windowHeight } = this.$parent.getSystemInfo();
+      this.minHeight = windowHeight;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

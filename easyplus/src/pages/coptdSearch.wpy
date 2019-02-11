@@ -1,0 +1,254 @@
+<style lang="less">
+  .wrapper {
+    background-color: #fff;
+    box-sizing: border-box;
+    padding: 30rpx 30rpx 0;
+
+    .row {
+      box-sizing: border-box;
+      width: 100%;
+      line-height: 50rpx;
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-items: flex-start;
+      margin-bottom: 10rpx;
+
+      .row-label {
+        font-size: 14px;
+        width: 160rpx;
+        line-height: 84rpx;
+        text-align: left;
+        color: #00acff;
+      }
+
+      .row-content {
+        font-size: 14px;
+      }
+    }
+
+    .input,
+    .input-text-area{
+      box-sizing: border-box;
+      width: 530rpx;
+      /*display: block;*/
+      padding: 20rpx;
+      border: 1rpx solid #eee;
+      font-size: 14px;
+      line-height: 40rpx;
+      color: #353535;
+      border-radius: 10rpx;
+    }
+    .input {
+      height: 84rpx;
+    }
+
+    .input-text-area {
+      min-height: 280rpx;
+    }
+
+    .btn-row {
+      box-sizing: border-box;
+      width: 100%;
+      display: flex;
+      flex-wrap: nowrap;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    button {
+      box-sizing: border-box;
+      height: 78rpx;
+      line-height: 78rpx;
+      background-color: #00acff;
+      color: #fff;
+      font-size: 14px;
+      border: 0 none;
+      border-radius: 14rpx;
+      flex-grow: 1;
+      margin-right: 10rpx;
+    }
+
+    button:last-child {
+      margin-left: 10rpx;
+      margin-right: 0;
+    }
+
+    .button-hover {
+      opacity: .8;
+    }
+
+    button.go-back {
+      background-color: #ccc;
+      color: #353535;
+    }
+
+    .checkbox{
+      display: inline-block;
+      margin: 5px 10px 5px 0;
+    }
+  }
+</style>
+
+<template>
+  <view class="wrapper" style="min-height: {{minHeight}}px;">
+  <view class="row">
+      <view class="row-label">订单单别：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{td001}}" @input="handleInputTd001"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">订单号：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{td002}}" @input="handleInputTd002"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">客户名称：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{ma003}}" @input="handleInputMa003"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">品名：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{td005}}" @input="handleInputTd005"/>
+      </view>
+    </view>
+        <view class="row">
+      <view class="row-label">规格：</view>
+      <view class="row-content">
+        <input class="input" auto-focus type="text" value="{{td006}}" @input="handleInputTd006"/>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">订单状态：</view>
+      <view class="row-content">
+        <picker mode="selector" range="{{statuses}}" range-key="{{'sa'}}" value="{{index}}" @change="handleChangeStatus">
+          <view class="input">
+            {{statusName}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">从：</view>
+      <view class="row-content">
+        <picker mode="date" value="{{startYmd}}"  @change="handleChangeStart">
+          <view class="picker">
+            当前选择: {{startYmd}}
+          </view>
+        </picker>
+      </view>
+    </view>
+    <view class="row">
+      <view class="row-label">到：</view>
+      <view class="row-content">
+        <picker mode="date" value="{{endYmd}}"  @change="handleChangeEnd">
+          <view class="picker">
+            当前选择: {{endYmd}}
+          </view>
+        </picker>
+      </view>
+    </view>
+
+
+    <view class="row">
+      <view class="btn-row">
+        <button hover-class="button-hover" @tap="handleSearch">搜索</button>
+        <button type="default" class="go-back" hover-class="button-hover" @tap="handleGoBak">返回</button>
+      </view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy';
+  import coptdApi from '../api/coptdApi';
+  import Auth from '../mixins/Auth';
+
+  export default class CoptdSearch extends wepy.page {
+    config = {
+      navigationBarTitleText: '订单多条件查询'
+    };
+
+    components = {
+    };
+
+    mixins = [Auth];
+
+    data = {
+      td001: '',
+      td002: '',
+      td005: '',
+      td006: '',
+      minHeight: 0,
+      statusName: '',
+      td016: '',
+      ma003: '',
+      td013: '',
+      startYmd: '',//开始日
+      endYmd: '',//结束日
+      statuses: [{sa:'未交',sv:'N'},{sa:'已交',sv:'Y'},{sa:'指定结束',sv:'y'}]
+    };
+
+    methods = {
+      handleInputTd005 (e) {
+        this.td005 = e.detail.value;
+      },
+      handleInputTd001 (e) {
+        this.td001 = e.detail.value;
+      },
+      handleInputTd006 (e) {
+        this.td006 = e.detail.value;
+      },
+      handleInputMa003 (e) {
+        this.ma003 = e.detail.value;
+      },
+      handleInputTd002 (e) {
+        this.td002 = e.detail.value;
+
+      },
+      handleChangeEnd(e){
+        this.endYmd = e.detail.value;
+      },
+      handleChangeStart(e){
+        this.startYmd = e.detail.value;
+      },
+      handleChangeStatus (e) {
+        const index = parseInt(e.detail.value);
+        this.statusName = this.statuses[index].sa;
+        this.td016 = this.statuses[index].sv;
+      },
+
+      handleSearch () {
+        wepy.redirectTo({
+          url: `./coptd?type=1&keyword=${this.td002}&td005=${this.td005}&td006=${this.td006}&ma003=${this.ma003}&td016=${this.td016}&td001=${this.td001}&startYmd=${this.startYmd}&endYmd=${this.endYmd}`
+        });
+      },
+      handleGoBak () {
+        wepy.redirectTo({
+          url: './coptd'
+        });
+      },
+    };
+
+    events = {};
+
+    loadData() {
+      this.$apply();
+    }
+
+    onLoad(query) {
+      const {windowHeight} = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log(query);
+      this.td001 = query.td001;
+      this.td013 = query.td013;
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>

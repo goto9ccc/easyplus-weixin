@@ -1,0 +1,6 @@
+easyplus/node_modules/
+easyplus/.idea/
+easyplus/.vscode/
+easyplus/dist/
+easyplus/docs/
+easyplus/.wepycache

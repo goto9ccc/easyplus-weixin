@@ -1,0 +1,49 @@
+<style lang="less">
+    
+</style>
+
+<template>
+    <webview src="https://easy.tooeye.cn" />
+</template>
+<script>
+    import wepy from 'wepy';
+    import Auth from "../mixins/Auth";
+    import config from '../config';
+    export default class Wepapp extends wepy.page {
+    config = {
+      navigationBarTitleText: 'WEB应用'
+    };
+    components = {
+
+    };
+    //集成认证
+    mixins = [Auth];
+
+    data = {
+      url: '',
+    };
+
+    computed = {
+
+    };
+
+    methods = {
+    };
+
+    events = {};
+
+    loadData(){
+        this.url = config.webappurl || '';
+    }
+
+
+
+    onLoad() {
+      const { windowHeight } = wepy.getSystemInfoSync();
+      this.minHeight = windowHeight;
+      console.log();
+      
+      this.auth().then(() => this.loadData());
+    }
+  }
+</script>
