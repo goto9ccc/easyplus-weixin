@@ -1,7 +1,7 @@
 # EasyPlus 微信小程序
 
 #### 项目介绍
-EasyPlus 微信小程序
+EasyPlus 微信小程序  https://github.com/goto9ccc/easyplus-weixin.git
 
 
 
